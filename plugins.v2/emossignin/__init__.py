@@ -29,7 +29,7 @@ class EmosSignIn(_PluginBase):
     plugin_name = "Emos签到助手"
     plugin_desc = "自动签到Emos站点，追踪萝卜收益，查看签到历史。"
     plugin_icon = "emossignin.png"
-    plugin_version = "1.0"
+    plugin_version = "1.1"
     plugin_author = "feng"
     author_url = "https://github.com/cn857"
     plugin_config_prefix = "emossignin_"
@@ -185,6 +185,68 @@ class EmosSignIn(_PluginBase):
                         "content": [
                             {
                                 "component": "VCol",
+                                "props": {"cols": 12, "class": "mb-3"},
+                                "content": [
+                                    {
+                                        "component": "VBtn",
+                                        "props": {
+                                            "variant": "outlined",
+                                            "size": "small",
+                                            "class": "mr-2 mb-1",
+                                            "prependIcon": "mdi-clock-outline",
+                                            "text": "每天 8:00",
+                                        },
+                                        "events": {
+                                            "click": {
+                                                "api": "plugin/EmosSignIn/set_cron",
+                                                "method": "post",
+                                                "params": {"cron": "0 8 * * *"},
+                                            }
+                                        },
+                                    },
+                                    {
+                                        "component": "VBtn",
+                                        "props": {
+                                            "variant": "outlined",
+                                            "size": "small",
+                                            "class": "mr-2 mb-1",
+                                            "prependIcon": "mdi-clock-outline",
+                                            "text": "每天 12:00",
+                                        },
+                                        "events": {
+                                            "click": {
+                                                "api": "plugin/EmosSignIn/set_cron",
+                                                "method": "post",
+                                                "params": {"cron": "0 12 * * *"},
+                                            }
+                                        },
+                                    },
+                                    {
+                                        "component": "VBtn",
+                                        "props": {
+                                            "variant": "outlined",
+                                            "size": "small",
+                                            "class": "mr-2 mb-1",
+                                            "prependIcon": "mdi-clock-outline",
+                                            "text": "每天 20:00",
+                                        },
+                                        "events": {
+                                            "click": {
+                                                "api": "plugin/EmosSignIn/set_cron",
+                                                "method": "post",
+                                                "params": {"cron": "0 20 * * *"},
+                                            }
+                                        },
+                                    },
+                                ],
+                            }
+                        ],
+                    },
+                    {
+                        "component": "VRow",
+                        "content": [
+                            {
+                                "component": "VCol",
                                 "props": {"cols": 12},
                                 "content": [
                                     {
@@ -265,7 +327,116 @@ class EmosSignIn(_PluginBase):
         }
 
     def get_page(self) -> List[dict]:
-        return []
+        """返回插件详情页 JSON，展示签到状态概览。"""
+        stats = self.get_data(self.DATA_KEY_STATS) or {}
+        today_str = date.today().isoformat()
+        signed_today = stats.get("last_signin_date") == today_str
+        total_signins = stats.get("total_signins", 0)
+        total_carrots = stats.get("total_carrots", 0)
+
+        return [
+            {
+                "component": "VAlert",
+                "props": {
+                    "type": "success" if self._enabled else "warning",
+                    "variant": "tonal",
+                    "density": "compact",
+                    "text": f"插件状态: {'已启用' if self._enabled else '已停用'}",
+                },
+            },
+            {
+                "component": "VAlert",
+                "props": {
+                    "type": "success" if self._token else "warning",
+                    "variant": "tonal",
+                    "density": "compact",
+                    "text": f"密钥配置: {'已配置' if self._token else '未配置'}",
+                    "class": "mt-3",
+                },
+            },
+            {
+                "component": "VAlert",
+                "props": {
+                    "type": "success" if signed_today else "info",
+                    "variant": "tonal",
+                    "density": "compact",
+                    "text": f"今日签到: {'已完成' if signed_today else '待签到'}",
+                    "class": "mt-3",
+                },
+            },
+            {
+                "component": "VRow",
+                "props": {"class": "mt-4"},
+                "content": [
+                    {
+                        "component": "VCol",
+                        "props": {"cols": 6},
+                        "content": [
+                            {
+                                "component": "VCard",
+                                "props": {"variant": "outlined"},
+                                "content": [
+                                    {
+                                        "component": "VCardText",
+                                        "props": {},
+                                        "content": [
+                                            {
+                                                "component": "div",
+                                                "props": {"class": "text-caption text-medium-emphasis"},
+                                                "text": "累计签到",
+                                            },
+                                            {
+                                                "component": "div",
+                                                "props": {"class": "text-h5 font-weight-bold"},
+                                                "text": f"{total_signins} 次",
+                                            },
+                                        ],
+                                    }
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        "component": "VCol",
+                        "props": {"cols": 6},
+                        "content": [
+                            {
+                                "component": "VCard",
+                                "props": {"variant": "outlined"},
+                                "content": [
+                                    {
+                                        "component": "VCardText",
+                                        "props": {},
+                                        "content": [
+                                            {
+                                                "component": "div",
+                                                "props": {"class": "text-caption text-medium-emphasis"},
+                                                "text": "累计萝卜",
+                                            },
+                                            {
+                                                "component": "div",
+                                                "props": {"class": "text-h5 font-weight-bold"},
+                                                "text": f"{total_carrots} 🥕",
+                                            },
+                                        ],
+                                    }
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                "component": "VAlert",
+                "props": {
+                    "type": "info",
+                    "variant": "tonal",
+                    "density": "compact",
+                    "text": f"签到时间: {self._cron} | 通知: {'开' if self._notify else '关'} | 接口: {self._base_url}",
+                    "class": "mt-3",
+                },
+            },
+        ]
 
     def get_sidebar_nav(self) -> List[Dict[str, Any]]:
         if not self.get_state():
@@ -311,6 +482,13 @@ class EmosSignIn(_PluginBase):
                 "methods": ["GET"],
                 "auth": "bear",
                 "summary": "获取签到历史",
+            },
+            {
+                "path": "/set_cron",
+                "endpoint": self.set_cron_api,
+                "methods": ["POST"],
+                "auth": "bear",
+                "summary": "设置签到时间",
             },
         ]
 
@@ -454,6 +632,11 @@ class EmosSignIn(_PluginBase):
 
                 sign_data = sign_res.json()
                 carrot_earned = self._extract_carrot(sign_data)
+                if carrot_earned == 0:
+                    logger.warning(
+                        f"Emos签到助手：未能从签到响应中提取萝卜数量，"
+                        f"原始响应: {str(sign_data)[:500]}"
+                    )
 
                 # Step 4: 记录历史与统计
                 record = {
@@ -502,8 +685,15 @@ class EmosSignIn(_PluginBase):
         if not isinstance(response_data, dict):
             return 0
 
+        # 所有尝试匹配的字段名
+        carrot_keys = (
+            "carrot", "carrots", "carrot_earned", "earned",
+            "point", "points", "reward", "amount", "value",
+            "gain", "bonus", "credit", "credits", "obtain",
+        )
+
         # 直接在顶层查找
-        for key in ("carrot", "carrots", "carrot_earned", "earned", "point", "points"):
+        for key in carrot_keys:
             val = response_data.get(key)
             if val is not None:
                 try:
@@ -511,11 +701,11 @@ class EmosSignIn(_PluginBase):
                 except (ValueError, TypeError):
                     pass
 
-        # 在 data / response / sign 中查找
-        for outer in ("data", "response", "sign"):
+        # 在 data / response / sign / reward / result 中查找
+        for outer in ("data", "response", "sign", "reward", "result"):
             inner = response_data.get(outer)
             if isinstance(inner, dict):
-                for key in ("carrot", "carrots", "carrot_earned", "earned", "point", "points"):
+                for key in carrot_keys:
                     val = inner.get(key)
                     if val is not None:
                         try:
@@ -526,15 +716,16 @@ class EmosSignIn(_PluginBase):
         # 尝试 data.sign.carrot 等深层嵌套
         data = response_data.get("data")
         if isinstance(data, dict):
-            sign = data.get("sign")
-            if isinstance(sign, dict):
-                for key in ("carrot", "carrots", "carrot_earned", "earned"):
-                    val = sign.get(key)
-                    if val is not None:
-                        try:
-                            return int(val)
-                        except (ValueError, TypeError):
-                            pass
+            for sub in ("sign", "reward", "result"):
+                sub_obj = data.get(sub)
+                if isinstance(sub_obj, dict):
+                    for key in carrot_keys:
+                        val = sub_obj.get(key)
+                        if val is not None:
+                            try:
+                                return int(val)
+                            except (ValueError, TypeError):
+                                pass
 
         return 0
 
@@ -615,3 +806,17 @@ class EmosSignIn(_PluginBase):
         except Exception as e:
             logger.error(f"Emos签到助手：获取历史失败 - {e}")
             return schemas.Response(success=False, message=str(e))
+
+    def set_cron_api(self, cron: str = "") -> schemas.Response:
+        """设置签到时间 Cron 表达式。"""
+        if not cron or not cron.strip():
+            return schemas.Response(success=False, message="cron 参数不能为空")
+        cron = cron.strip()
+        self._cron = cron
+        self._update_config()
+        self.stop_service()
+        logger.info(f"Emos签到助手：签到时间已更新为 {cron}")
+        return schemas.Response(
+            success=True,
+            message=f"签到时间已更新为 {cron}，下次重新加载配置后生效。",
+        )
