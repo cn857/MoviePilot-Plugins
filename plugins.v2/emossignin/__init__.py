@@ -29,7 +29,7 @@ class EmosSignIn(_PluginBase):
     plugin_name = "Emos签到助手"
     plugin_desc = "自动签到Emos站点，追踪萝卜收益，查看签到历史。"
     plugin_icon = "emossignin.png"
-    plugin_version = "1.2"
+    plugin_version = "1.3"
     plugin_author = "feng"
     author_url = "https://github.com/cn857"
     plugin_config_prefix = "emossignin_"
@@ -56,6 +56,8 @@ class EmosSignIn(_PluginBase):
     _notify: bool = True
     _onlyonce: bool = False
     _show_sidebar: bool = True
+    _random_saying: bool = False
+    _random_saying_url: str = "https://v1.uapis.cn"
 
     def init_plugin(self, config: dict = None):
         """根据当前配置初始化插件。"""
@@ -70,6 +72,8 @@ class EmosSignIn(_PluginBase):
         self._notify = bool(config.get("notify"))
         self._onlyonce = bool(config.get("onlyonce"))
         self._show_sidebar = bool(config.get("show_sidebar", True))
+        self._random_saying = bool(config.get("random_saying", False))
+        self._random_saying_url = str(config.get("random_saying_url") or "https://v1.uapis.cn").rstrip("/")
 
         # 立即运行一次
         if self._onlyonce:
@@ -334,6 +338,38 @@ class EmosSignIn(_PluginBase):
                             },
                         ],
                     },
+                    {
+                        "component": "VRow",
+                        "content": [
+                            {
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 8},
+                                "content": [
+                                    {
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "random_saying_url",
+                                            "label": "一言 API 地址",
+                                            "placeholder": "https://v1.uapis.cn",
+                                        },
+                                    }
+                                ],
+                            },
+                            {
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
+                                    {
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "random_saying",
+                                            "label": "启用一言附言",
+                                        },
+                                    }
+                                ],
+                            },
+                        ],
+                    },
                 ],
             }
         ], {
@@ -344,8 +380,10 @@ class EmosSignIn(_PluginBase):
             "sign_content": "",
             "notify": True,
             "onlyonce": False,
+            "show_sidebar": True,
+            "random_saying": False,
+            "random_saying_url": "https://v1.uapis.cn",
         }
-
     def get_page(self) -> List[dict]:
         """返回插件详情页 JSON，展示签到状态概览。"""
         stats = self.get_data(self.DATA_KEY_STATS) or {}
@@ -548,6 +586,8 @@ class EmosSignIn(_PluginBase):
                 "notify": self._notify,
                 "onlyonce": self._onlyonce,
                 "show_sidebar": self._show_sidebar,
+                "random_saying": self._random_saying,
+                "random_saying_url": self._random_saying_url,
             }
         )
 
@@ -635,9 +675,26 @@ class EmosSignIn(_PluginBase):
                     return
 
                 # Step 3: 执行签到
+                # Build sign URL with content
+                actual_content = self._sign_content
+                if self._random_saying:
+                    try:
+                        saying_res = RequestUtils(proxies=settings.PROXY).get_res(
+                            url=f"{self._random_saying_url}/api/v1/saying/random?mode=daily",
+                        )
+                        if saying_res and saying_res.status_code == 200:
+                            saying_data = saying_res.json()
+                            if saying_data.get("code") == 0:
+                                fetched = saying_data.get("data", {}).get("content", "")
+                                if fetched:
+                                    actual_content = fetched[:200]
+                    except Exception as e:
+                        logger.warning(f"Emos签到助手：获取一言失败，{e}，使用静态附言")
+
                 sign_url = f"{self._base_url}/api/user/sign"
-                if self._sign_content:
-                    sign_url += f"?content={self._sign_content}"
+                if actual_content:
+                    import urllib.parse
+                    sign_url += f"?content={urllib.parse.quote(actual_content)}"
 
                 sign_res = req.put_res(sign_url)
                 if not sign_res or sign_res.status_code != 200:
@@ -663,7 +720,7 @@ class EmosSignIn(_PluginBase):
                 record = {
                     "date": today_str,
                     "carrot_earned": carrot_earned,
-                    "content": self._sign_content,
+                    "content": actual_content,
                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 }
                 history = self.get_data(self.DATA_KEY_HISTORY) or []
