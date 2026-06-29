@@ -29,7 +29,7 @@ class EmosSignIn(_PluginBase):
     plugin_name = "Emos签到助手"
     plugin_desc = "自动签到Emos站点，追踪萝卜收益，查看签到历史。"
     plugin_icon = "emossignin.png"
-    plugin_version = "1.1"
+    plugin_version = "1.2"
     plugin_author = "feng"
     author_url = "https://github.com/cn857"
     plugin_config_prefix = "emossignin_"
@@ -55,6 +55,7 @@ class EmosSignIn(_PluginBase):
     _sign_content: str = ""
     _notify: bool = True
     _onlyonce: bool = False
+    _show_sidebar: bool = True
 
     def init_plugin(self, config: dict = None):
         """根据当前配置初始化插件。"""
@@ -68,6 +69,7 @@ class EmosSignIn(_PluginBase):
         self._sign_content = str(config.get("sign_content") or "").strip()
         self._notify = bool(config.get("notify"))
         self._onlyonce = bool(config.get("onlyonce"))
+        self._show_sidebar = bool(config.get("show_sidebar", True))
 
         # 立即运行一次
         if self._onlyonce:
@@ -314,6 +316,24 @@ class EmosSignIn(_PluginBase):
                             },
                         ],
                     },
+                    {
+                        "component": "VRow",
+                        "content": [
+                            {
+                                "component": "VCol",
+                                "props": {"cols": 12, "md": 4},
+                                "content": [
+                                    {
+                                        "component": "VSwitch",
+                                        "props": {
+                                            "model": "show_sidebar",
+                                            "label": "启用左侧导航",
+                                        },
+                                    }
+                                ],
+                            },
+                        ],
+                    },
                 ],
             }
         ], {
@@ -439,7 +459,7 @@ class EmosSignIn(_PluginBase):
         ]
 
     def get_sidebar_nav(self) -> List[Dict[str, Any]]:
-        if not self.get_state():
+        if not self.get_state() or not self._show_sidebar:
             return []
         return [
             {
@@ -527,6 +547,7 @@ class EmosSignIn(_PluginBase):
                 "sign_content": self._sign_content,
                 "notify": self._notify,
                 "onlyonce": self._onlyonce,
+                "show_sidebar": self._show_sidebar,
             }
         )
 
@@ -688,7 +709,7 @@ class EmosSignIn(_PluginBase):
         # 所有尝试匹配的字段名
         carrot_keys = (
             "carrot", "carrots", "carrot_earned", "earned",
-            "point", "points", "reward", "amount", "value",
+            "point", "points", "earn_point", "reward", "amount", "value",
             "gain", "bonus", "credit", "credits", "obtain",
         )
 
