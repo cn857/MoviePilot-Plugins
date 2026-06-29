@@ -3,13 +3,15 @@
     "name": "Emos签到助手",
     "description": "自动签到Emos站点，追踪萝卜收益，查看签到历史。支持自定义签到时间和附言。",
     "labels": "签到,Emos",
-    "version": "1.1",
+    "version": "1.3",
     "icon": "https://raw.githubusercontent.com/cn857/MoviePilot-Plugins/main/icons/emos.png",
     "author": "feng",
     "level": 1,
     "history": {
       "v1.1": "修复萝卜统计解析、新增Cron快捷设置按钮、新增插件详情页",
-      "v1.0": "首次发布，支持自动签到、萝卜追踪、签到历史、通知推送"
+      "v1.0": "首次发布，支持自动签到、萝卜追踪、签到历史、通知推送",
+      "v1.2": "修复earn_point萝卜解析、新增左侧导航开关",
+      "v1.3": "新增一言(随机句子)附言功能，可从 uapis.cn 获取每日一言作为签到附言"
     }
   }
 }
