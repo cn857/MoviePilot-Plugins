@@ -28,7 +28,7 @@ class EmosSignIn(_PluginBase):
 
     plugin_name = "Emos签到助手"
     plugin_desc = "自动签到Emos站点，追踪萝卜收益，查看签到历史。"
-    plugin_icon = "emos.png"
+    plugin_icon = "https://raw.githubusercontent.com/cn857/MoviePilot-Plugins/main/icons/emos.png"
     plugin_version = "1.5"
     plugin_author = "feng"
     author_url = "https://github.com/cn857"
