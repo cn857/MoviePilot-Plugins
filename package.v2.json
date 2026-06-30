@@ -3,7 +3,7 @@
     "name": "Emos签到助手",
     "description": "自动签到Emos站点，追踪萝卜收益，查看签到历史。支持自定义签到时间和附言。",
     "labels": "签到,Emos",
-    "version": "1.4",
+    "version": "1.5",
     "icon": "https://raw.githubusercontent.com/cn857/MoviePilot-Plugins/main/icons/emos.png",
     "author": "feng",
     "level": 2,
