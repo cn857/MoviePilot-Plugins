@@ -45,6 +45,10 @@ Emos API 参考文档见 [docs/emos_api.md](./docs/emos_api.md)。
 
 ## 版本历史
 
+### v1.5
+
+- **新增** 插件详情页底部添加「前往配置」按钮，引导用户快速跳转到配置页面
+
 ### v1.4
 
 - **修复** 一言 API 地址默认值错误（`v1.uapis.cn` → `uapis.cn`）
