@@ -8,6 +8,8 @@ const _hoisted_2 = { class: "mb-4" };
 const _hoisted_3 = { class: "mb-4" };
 const _hoisted_4 = { class: "mb-4" };
 const _hoisted_5 = { class: "mb-6" };
+const _hoisted_5b = { class: "mb-4" };
+const _hoisted_5c = { class: "mb-4" };
 const _hoisted_6 = { class: "d-flex ga-3" };
 
 const {reactive,ref} = await importShared('vue');
@@ -41,6 +43,9 @@ const form = reactive({
   sign_content: props.initialConfig.sign_content ?? '',
   notify: props.initialConfig.notify ?? true,
   onlyonce: props.initialConfig.onlyonce ?? false,
+  show_sidebar: props.initialConfig.show_sidebar ?? true,
+  random_saying: props.initialConfig.random_saying ?? false,
+  random_saying_url: props.initialConfig.random_saying_url ?? 'https://uapis.cn',
 });
 
 const saving = ref(false);
@@ -60,6 +65,9 @@ function handleSave() {
     sign_content: form.sign_content,
     notify: form.notify,
     onlyonce: form.onlyonce,
+    show_sidebar: form.show_sidebar,
+    random_saying: form.random_saying,
+    random_saying_url: form.random_saying_url,
   };
 
   emit('save', payload);
@@ -178,6 +186,37 @@ return (_ctx, _cache) => {
                 "hide-details": ""
               }, null, 8, ["modelValue"]),
               _cache[12] || (_cache[12] = _createElementVNode("div", { class: "text-caption text-medium-emphasis mt-1" }, " 保存后将立即执行一次签到（用于测试配置是否正常） ", -1))
+            ]),
+            _createElementVNode("div", _hoisted_5b, [
+              _createVNode(_component_VSwitch, {
+                modelValue: form.show_sidebar,
+                "onUpdate:modelValue": _cache[16] || (_cache[16] = $event => ((form.show_sidebar) = $event)),
+                label: "启用左侧导航",
+                color: "primary",
+                "hide-details": ""
+              }, null, 8, ["modelValue"]),
+              _cache[17] || (_cache[17] = _createElementVNode("div", { class: "text-caption text-medium-emphasis mt-1" }, " 在侧栏显示插件入口 ", -1))
+            ]),
+            _createElementVNode("div", _hoisted_5c, [
+              _createVNode(_component_VTextField, {
+                modelValue: form.random_saying_url,
+                "onUpdate:modelValue": _cache[18] || (_cache[18] = $event => ((form.random_saying_url) = $event)),
+                label: "一言 API 地址",
+                placeholder: "https://uapis.cn",
+                variant: "outlined",
+                density: "comfortable",
+                class: "mb-2",
+                "hide-details": "auto",
+                "persistent-placeholder": ""
+              }, null, 8, ["modelValue"]),
+              _createVNode(_component_VSwitch, {
+                modelValue: form.random_saying,
+                "onUpdate:modelValue": _cache[19] || (_cache[19] = $event => ((form.random_saying) = $event)),
+                label: "启用一言附言",
+                color: "primary",
+                "hide-details": ""
+              }, null, 8, ["modelValue"]),
+              _cache[20] || (_cache[20] = _createElementVNode("div", { class: "text-caption text-medium-emphasis mt-1" }, " 从 uapis.cn 获取一言(随机句子)作为签到附言 ", -1))
             ]),
             _createElementVNode("div", _hoisted_6, [
               _createVNode(_component_VBtn, {

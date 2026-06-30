@@ -25,7 +25,7 @@
 | 立即执行一次 | 保存后立即跑一次签到 | 关 |
 | 左侧导航入口 | 在侧栏显示插件入口 | 开 |
 | 启用一言附言 | 签到附言使用一言(随机句子)API | 关 |
-| 一言 API 地址 | 一言(随机句子)API 接口地址 | https://v1.uapis.cn |
+| 一言 API 地址 | 一言(随机句子)API 接口地址 | https://uapis.cn |
 
 ## 获取密钥
 
@@ -44,6 +44,13 @@
 Emos API 参考文档见 [docs/emos_api.md](./docs/emos_api.md)。
 
 ## 版本历史
+
+### v1.4
+
+- **修复** 一言 API 地址默认值错误（`v1.uapis.cn` → `uapis.cn`）
+- **修复** 一言 API 响应解析（`code`/`data.content` → `item.content`）
+- **修复** 前端配置弹窗缺少 `show_sidebar`/`random_saying`/`random_saying_url` 字段
+- **优化** 重构插件结构，适配 Vue 联邦插件最佳实践
 
 ### v1.3
 
