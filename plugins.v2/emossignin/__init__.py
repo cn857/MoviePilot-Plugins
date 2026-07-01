@@ -1,4 +1,6 @@
 import threading
+import time
+import random
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -325,6 +327,7 @@ class EmosSignIn(_PluginBase):
             "Authorization": f"Bearer {self._token}",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             "Accept": "application/json",
+            "Referer": f"{self._base_url}/",
         }
 
     def _request(self) -> RequestUtils:
@@ -435,7 +438,22 @@ class EmosSignIn(_PluginBase):
                     import urllib.parse
                     sign_url += f"?content={urllib.parse.quote(actual_content)}"
 
-                sign_res = req.put_res(sign_url)
+                # 随机延迟 2-5 秒，避免 CloudFlare 风控
+                delay = random.uniform(2, 5)
+                logger.info(f"Emos签到助手：等待 {delay:.1f}s 后执行签到...")
+                time.sleep(delay)
+
+                # 使用带 Referer 的新请求实例，模拟浏览器行为
+                sign_req = RequestUtils(
+                    headers={
+                        "Authorization": f"Bearer {self._token}",
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                        "Accept": "application/json",
+                        "Referer": f"{self._base_url}/",
+                    },
+                    proxies=settings.PROXY,
+                )
+                sign_res = sign_req.put_res(sign_url)
                 if not sign_res or sign_res.status_code != 200:
                     status_code = sign_res.status_code if sign_res else "None"
                     logger.error(f"Emos签到助手：签到请求失败，HTTP {status_code}")
