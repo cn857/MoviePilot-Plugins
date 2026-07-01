@@ -29,7 +29,7 @@ class EmosSignIn(_PluginBase):
     plugin_name = "Emos签到助手"
     plugin_desc = "自动签到Emos站点，追踪萝卜收益，查看签到历史。"
     plugin_icon = "https://raw.githubusercontent.com/cn857/MoviePilot-Plugins/main/icons/emos.png"
-    plugin_version = "1.7"
+    plugin_version = "1.8"
     plugin_author = "feng"
     author_url = "https://github.com/cn857"
     plugin_config_prefix = "emossignin_"
@@ -175,75 +175,14 @@ class EmosSignIn(_PluginBase):
                                 "props": {"cols": 12, "md": 6},
                                 "content": [
                                     {
-                                        "component": "VCronField",
+                                        "component": "VTextField",
                                         "props": {
                                             "model": "cron",
-                                            "label": "签到时间",
+                                            "label": "签到时间 (Cron 表达式)",
                                             "placeholder": "0 8 * * *",
+                                            "persistentPlaceholder": True,
                                         },
                                     }
-                                ],
-                            }
-                        ],
-                    },
-                    {
-                        "component": "VRow",
-                        "content": [
-                            {
-                                "component": "VCol",
-                                "props": {"cols": 12, "class": "mb-3"},
-                                "content": [
-                                    {
-                                        "component": "VBtn",
-                                        "props": {
-                                            "variant": "outlined",
-                                            "size": "small",
-                                            "class": "mr-2 mb-1",
-                                            "prependIcon": "mdi-clock-outline",
-                                            "text": "每天 8:00",
-                                        },
-                                        "events": {
-                                            "click": {
-                                                "api": "plugin/EmosSignIn/set_cron",
-                                                "method": "post",
-                                                "params": {"cron": "0 8 * * *"},
-                                            }
-                                        },
-                                    },
-                                    {
-                                        "component": "VBtn",
-                                        "props": {
-                                            "variant": "outlined",
-                                            "size": "small",
-                                            "class": "mr-2 mb-1",
-                                            "prependIcon": "mdi-clock-outline",
-                                            "text": "每天 12:00",
-                                        },
-                                        "events": {
-                                            "click": {
-                                                "api": "plugin/EmosSignIn/set_cron",
-                                                "method": "post",
-                                                "params": {"cron": "0 12 * * *"},
-                                            }
-                                        },
-                                    },
-                                    {
-                                        "component": "VBtn",
-                                        "props": {
-                                            "variant": "outlined",
-                                            "size": "small",
-                                            "class": "mr-2 mb-1",
-                                            "prependIcon": "mdi-clock-outline",
-                                            "text": "每天 20:00",
-                                        },
-                                        "events": {
-                                            "click": {
-                                                "api": "plugin/EmosSignIn/set_cron",
-                                                "method": "post",
-                                                "params": {"cron": "0 20 * * *"},
-                                            }
-                                        },
-                                    },
                                 ],
                             }
                         ],
@@ -495,31 +434,9 @@ class EmosSignIn(_PluginBase):
                 },
             },
             {
-                "component": "VRow",
-                "props": {"class": "mt-4"},
-                "content": [
-                    {
-                        "component": "VCol",
-                        "props": {"cols": 12},
-                        "content": [
-                            {
-                                "component": "VBtn",
-                                "props": {
-                                    "color": "primary",
-                                    "variant": "outlined",
-                                    "block": True,
-                                    "prepend-icon": "mdi-cog-outline",
-                                },
-                                "text": "前往配置",
-                            },
-                            {
-                                "component": "div",
-                                "props": {"class": "text-caption text-medium-emphasis mt-2 text-center"},
-                                "text": "关闭详情后，点击插件卡片上的编辑按钮可修改配置",
-                            },
-                        ],
-                    },
-                ],
+                "component": "div",
+                "props": {"class": "text-caption text-medium-emphasis mt-4 text-center"},
+                "text": "💡 点击插件卡片上的齿轮图标可修改配置。",
             },
         ]
 

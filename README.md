@@ -45,6 +45,12 @@ Emos API 参考文档见 [docs/emos_api.md](./docs/emos_api.md)。
 
 ## 版本历史
 
+### v1.8
+
+- **修复** 插件卡片「配置」按钮不显示：将 `VCronField` 替换为标准 `VTextField`（`VCronField` 非 MoviePilot 内置组件，会导致表单解析失败，隐藏齿轮按钮）
+- **修复** 移除无效的 `get_page()` 中的「前往配置」死按钮（Vue 模式下不可点击）
+- **修复** 移除 `get_form()` 中三个 Cron 快捷设置按钮（在 Vue 配置模式下行为不可控）
+
 ### v1.7
 
 - **修复** 修正「前往配置」按钮的 JSON 结构，使按钮正常渲染显示（VBtn prop 格式矫正）
