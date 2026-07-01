@@ -384,11 +384,11 @@ class EmosSignIn(_PluginBase):
             try:
                 req = self._request()
 
-                # Step 1: 验证 Token
-                check_res = req.get_res(f"{self._base_url}/api/sign/check")
-                if not check_res or check_res.status_code != 200:
+                # 单请求同时完成 Token 验证 + 签到状态检查
+                user_res = req.get_res(f"{self._base_url}/api/user")
+                if not user_res or user_res.status_code != 200:
                     logger.error(
-                        f"Emos签到助手：Token 验证失败，状态码: {check_res.status_code if check_res else 'None'}"
+                        f"Emos签到助手：Token 验证失败，状态码: {user_res.status_code if user_res else 'None'}"
                     )
                     if self._notify:
                         self.post_message(
@@ -398,25 +398,17 @@ class EmosSignIn(_PluginBase):
                         )
                     return
 
-                # Step 2: 获取用户信息，检查 sign 字段
-                user_res = req.get_res(f"{self._base_url}/api/user")
-                if not user_res or user_res.status_code != 200:
-                    logger.error(
-                        f"Emos签到助手：获取用户信息失败，状态码: {user_res.status_code if user_res else 'None'}"
-                    )
-                    return
-
                 user_data = user_res.json()
                 sign_info = user_data.get("sign")
 
-                # 第二重检查：API 返回 sign 不为 null
+                # API 返回 sign 不为 null 说明今天已签到
                 if sign_info is not None:
                     logger.info("Emos签到助手：今日已签到（API 返回 sign 非 null）")
                     stats["last_signin_date"] = today_str
                     self.save_data(self.DATA_KEY_STATS, stats)
                     return
 
-                # Step 3: 执行签到
+                # Step 2: 执行签到
                 # Build sign URL with content
                 actual_content = self._sign_content
                 if self._random_saying:
