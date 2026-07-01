@@ -421,7 +421,11 @@ class EmosSignIn(_PluginBase):
                 actual_content = self._sign_content
                 if self._random_saying:
                     try:
-                        saying_res = RequestUtils(proxies=settings.PROXY).get_res(
+                        saying_req = RequestUtils(
+                            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                            proxies=settings.PROXY,
+                        )
+                        saying_res = saying_req.get_res(
                             url=f"{self._random_saying_url}/api/v1/saying/random?mode=daily",
                         )
                         if saying_res and saying_res.status_code == 200:
