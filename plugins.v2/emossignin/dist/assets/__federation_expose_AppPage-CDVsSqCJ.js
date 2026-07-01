@@ -449,6 +449,16 @@ return (_ctx, _cache) => {
                     }, 8, ["color"])
                   ]),
                   _: 1
+                }),
+                _createVNode$1(_component_VCol, {
+                  cols: "12",
+                  sm: "6"
+                }, {
+                  default: _withCtx$1(() => [
+                    _cache[13] || (_cache[13] = _createElementVNode$1("div", { class: "text-subtitle-2 text-medium-emphasis" }, "签到附言", -1)),
+                    _createElementVNode$1("div", _hoisted_13, _toDisplayString$1(config.value.sign_content || '（未设置，留空则默认签到）'), 1)
+                  ]),
+                  _: 1
                 })
               ]),
               _: 1
