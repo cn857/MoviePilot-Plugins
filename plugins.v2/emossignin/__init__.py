@@ -1,8 +1,7 @@
 import threading
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
@@ -77,18 +76,10 @@ class EmosSignIn(_PluginBase):
 
         # 立即运行一次
         if self._onlyonce:
-            self._scheduler = BackgroundScheduler(timezone=settings.TZ)
             logger.info("Emos签到助手：立即运行一次")
-            self._scheduler.add_job(
-                func=self.sign_in,
-                trigger="date",
-                run_date=datetime.now(tz=pytz.timezone(settings.TZ)).replace(second=0) + timedelta(seconds=3),
-                name="Emos签到-一次性",
-            )
             self._onlyonce = False
             self._update_config()
-            if self._scheduler.get_jobs():
-                self._scheduler.start()
+            threading.Timer(3, self.sign_in).start()
 
         # 后台验证 Token
         if self._enabled and self._token and not self._onlyonce:
@@ -413,6 +404,7 @@ class EmosSignIn(_PluginBase):
                 actual_content = self._sign_content
                 if self._random_saying:
                     try:
+                        logger.info(f"Emos签到助手：正在从 {self._random_saying_url} 获取一言...")
                         saying_req = RequestUtils(
                             headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
                             proxies=settings.PROXY,
@@ -427,6 +419,14 @@ class EmosSignIn(_PluginBase):
                             fetched = item.get("content", "") or saying_data.get("content", "")
                             if fetched:
                                 actual_content = fetched[:200]
+                                logger.info(f"Emos签到助手：一言获取成功: {actual_content}")
+                            else:
+                                logger.warning("Emos签到助手：一言API返回但未提取到内容，使用静态附言")
+                        else:
+                            logger.warning(
+                                f"Emos签到助手：一言API请求失败，"
+                                f"状态码: {saying_res.status_code if saying_res else 'None'}，使用静态附言"
+                            )
                     except Exception as e:
                         logger.warning(f"Emos签到助手：获取一言失败，{e}，使用静态附言")
 
